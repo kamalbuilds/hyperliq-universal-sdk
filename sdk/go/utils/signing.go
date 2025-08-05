@@ -77,10 +77,11 @@ func createTypedData(action interface{}, nonce int64) (*apitypes.TypedData, erro
 	}
 
 	// Create domain
+	chainId := big.NewInt(42161) // Arbitrum mainnet
 	domain := apitypes.TypedDataDomain{
 		Name:              "Hyperliquid",
 		Version:           "1",
-		ChainId:           (*big.Int)(big.NewInt(42161)), // Arbitrum mainnet
+		ChainId:           (*hexutil.Big)(chainId),
 		VerifyingContract: "0x0000000000000000000000000000000000000000",
 	}
 
