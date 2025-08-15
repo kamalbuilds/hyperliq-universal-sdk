@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/shopspring/decimal"
 )
@@ -262,4 +263,192 @@ type FilledOrder struct {
 	TotalSz decimal.Decimal `json:"totalSz"`
 	AvgPx   decimal.Decimal `json:"avgPx"`
 	Oid     int64           `json:"oid"`
+}
+
+// WebSocket Message Types
+
+// WSSubscription represents a WebSocket subscription request
+type WSSubscription struct {
+	Type     string      `json:"type"`
+	Coin     string      `json:"coin,omitempty"`
+	User     string      `json:"user,omitempty"`
+	Interval string      `json:"interval,omitempty"`
+}
+
+// WSMessage represents a generic WebSocket message
+type WSMessage struct {
+	Channel string          `json:"channel"`
+	Data    json.RawMessage `json:"data"`
+}
+
+// WSRequest represents a WebSocket request
+type WSRequest struct {
+	Method       string        `json:"method"`
+	Subscription WSSubscription `json:"subscription,omitempty"`
+}
+
+// WSPong represents a WebSocket pong response
+type WSPong struct {
+	Channel string `json:"channel"`
+}
+
+// AllMidsData represents mid price data for all assets
+type AllMidsData struct {
+	Mids map[string]string `json:"mids"`
+}
+
+// TradeData represents trade data from WebSocket
+type TradeData struct {
+	Coin string          `json:"coin"`
+	Side string          `json:"side"`
+	Px   decimal.Decimal `json:"px"`
+	Sz   decimal.Decimal `json:"sz"`
+	Time int64           `json:"time"`
+	Hash string          `json:"hash"`
+	Tid  int64           `json:"tid"`
+}
+
+// L2BookData represents order book data
+type L2BookData struct {
+	Coin   string          `json:"coin"`
+	Time   int64           `json:"time"`
+	Levels [][]interface{} `json:"levels"`
+}
+
+// CandleData represents candlestick data
+type CandleData struct {
+	Coin     string          `json:"coin"`
+	Interval string          `json:"interval"`
+	T        int64           `json:"T"`
+	O        decimal.Decimal `json:"o"`
+	H        decimal.Decimal `json:"h"`
+	L        decimal.Decimal `json:"l"`
+	C        decimal.Decimal `json:"c"`
+	V        decimal.Decimal `json:"v"`
+	N        int             `json:"n"`
+}
+
+// UserEvent represents a user event (fill, funding, liquidation)
+type UserEvent struct {
+	Type string          `json:"type"`
+	Data json.RawMessage `json:"data"`
+}
+
+// UserFillData represents user fill data from WebSocket
+type UserFillData struct {
+	User         string          `json:"user"`
+	Coin         string          `json:"coin"`
+	Px           decimal.Decimal `json:"px"`
+	Sz           decimal.Decimal `json:"sz"`
+	Side         string          `json:"side"`
+	Time         int64           `json:"time"`
+	StartPosition decimal.Decimal `json:"startPosition"`
+	Dir          string          `json:"dir"`
+	ClosedPnl    decimal.Decimal `json:"closedPnl"`
+	Hash         string          `json:"hash"`
+	Oid          int64           `json:"oid"`
+	Crossed      bool            `json:"crossed"`
+	Fee          decimal.Decimal `json:"fee"`
+	Tid          int64           `json:"tid"`
+	FeeToken     string          `json:"feeToken"`
+}
+
+// OrderUpdate represents an order update from WebSocket
+type OrderUpdate struct {
+	User      string          `json:"user"`
+	Coin      string          `json:"coin"`
+	Oid       int64           `json:"oid"`
+	Update    string          `json:"update"`
+	Status    string          `json:"status"`
+	LimitPx   decimal.Decimal `json:"limitPx,omitempty"`
+	Sz        decimal.Decimal `json:"sz,omitempty"`
+	Side      string          `json:"side,omitempty"`
+	Timestamp int64           `json:"timestamp"`
+	Cloid     *string         `json:"cloid,omitempty"`
+}
+
+// FundingData represents funding payment data
+type FundingData struct {
+	User        string          `json:"user"`
+	Coin        string          `json:"coin"`
+	FundingRate decimal.Decimal `json:"fundingRate"`
+	Szi         decimal.Decimal `json:"szi"`
+	Type        string          `json:"type"`
+	Time        int64           `json:"time"`
+	Usdc        decimal.Decimal `json:"usdc"`
+}
+
+// LiquidationData represents liquidation event data
+type LiquidationData struct {
+	User        string          `json:"user"`
+	Coin        string          `json:"coin"`
+	Szi         decimal.Decimal `json:"szi"`
+	Px          decimal.Decimal `json:"px"`
+	Time        int64           `json:"time"`
+	Liq         string          `json:"liq"`
+	Reason      string          `json:"reason"`
+}
+
+// NotificationData represents notification data
+type NotificationData struct {
+	User         string `json:"user"`
+	Notification string `json:"notification"`
+	Time         int64  `json:"time"`
+}
+
+// WebData2Data represents web data v2
+type WebData2Data struct {
+	User        string          `json:"user"`
+	UserSummary json.RawMessage `json:"userSummary"`
+	Time        int64           `json:"time"`
+}
+
+// ActiveAssetCtxData represents active asset context
+type ActiveAssetCtxData struct {
+	Coin         string          `json:"coin"`
+	Ctx          json.RawMessage `json:"ctx"`
+	Time         int64           `json:"time"`
+}
+
+// ActiveAssetDataData represents active asset data
+type ActiveAssetDataData struct {
+	User string          `json:"user"`
+	Coin string          `json:"coin"`
+	Data json.RawMessage `json:"data"`
+	Time int64           `json:"time"`
+}
+
+// BboData represents best bid/offer data
+type BboData struct {
+	Coin string          `json:"coin"`
+	Bid  decimal.Decimal `json:"bid"`
+	Ask  decimal.Decimal `json:"ask"`
+	Time int64           `json:"time"`
+}
+
+// OrderBook represents a live order book
+type OrderBook struct {
+	Coin    string           `json:"coin"`
+	Time    int64            `json:"time"`
+	Bids    []OrderBookLevel `json:"bids"`
+	Asks    []OrderBookLevel `json:"asks"`
+}
+
+// OrderBookLevel represents a level in the order book
+type OrderBookLevel struct {
+	Price    decimal.Decimal `json:"px"`
+	Size     decimal.Decimal `json:"sz"`
+	NumOrders int            `json:"n"`
+}
+
+// WSStats represents WebSocket connection statistics
+type WSStats struct {
+	Connected       bool          `json:"connected"`
+	Reconnects      int64         `json:"reconnects"`
+	MessagesReceived int64        `json:"messagesReceived"`
+	MessagesSent     int64        `json:"messagesSent"`
+	Subscriptions    int          `json:"subscriptions"`
+	Uptime          time.Duration `json:"uptime"`
+	LastPing        time.Time     `json:"lastPing"`
+	LastPong        time.Time     `json:"lastPong"`
 }

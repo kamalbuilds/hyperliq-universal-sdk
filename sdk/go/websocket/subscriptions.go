@@ -2,159 +2,188 @@ package websocket
 
 import (
 	"encoding/json"
-	"fmt"
-
 	"github.com/hyperliquid-labs/hyperliquid-go-sdk/types"
 )
 
-// SubscribeToTrades subscribes to trade updates for a specific coin
-func (m *Manager) SubscribeToTrades(coin string) (*Subscription, error) {
-	params := map[string]interface{}{
-		"type": "trades",
-		"coin": coin,
+// Subscription helper functions
+
+func (m *Manager) SubscribeToAllMids(handler func(data types.AllMidsData) error) (string, error) {
+	sub := types.WSSubscription{
+		Type: "allMids",
 	}
-	return m.Subscribe("trades", params)
+
+	return m.Subscribe(sub, func(raw json.RawMessage) error {
+		var data types.AllMidsData
+		if err := json.Unmarshal(raw, &data); err != nil {
+			return err
+		}
+		return handler(data)
+	})
 }
 
-// SubscribeToAllMids subscribes to mid price updates for all coins
-func (m *Manager) SubscribeToAllMids() (*Subscription, error) {
-	params := map[string]interface{}{
-		"type": "allMids",
+func (m *Manager) SubscribeToL2Book(coin string, handler func(data types.L2BookData) error) (string, error) {
+	sub := types.WSSubscription{
+		Type: "l2Book",
+		Coin: coin,
 	}
-	return m.Subscribe("allMids", params)
+
+	return m.Subscribe(sub, func(raw json.RawMessage) error {
+		var data types.L2BookData
+		if err := json.Unmarshal(raw, &data); err != nil {
+			return err
+		}
+		return handler(data)
+	})
 }
 
-// SubscribeToL2Book subscribes to order book updates
-func (m *Manager) SubscribeToL2Book(coin string) (*Subscription, error) {
-	params := map[string]interface{}{
-		"type": "l2Book",
-		"coin": coin,
+func (m *Manager) SubscribeToTrades(coin string, handler func(data []types.TradeData) error) (string, error) {
+	sub := types.WSSubscription{
+		Type: "trades",
+		Coin: coin,
 	}
-	return m.Subscribe("l2Book", params)
+
+	return m.Subscribe(sub, func(raw json.RawMessage) error {
+		var data []types.TradeData
+		if err := json.Unmarshal(raw, &data); err != nil {
+			return err
+		}
+		return handler(data)
+	})
 }
 
-// SubscribeToCandles subscribes to candlestick updates
-func (m *Manager) SubscribeToCandles(coin, interval string) (*Subscription, error) {
-	params := map[string]interface{}{
-		"type":     "candle",
-		"coin":     coin,
-		"interval": interval,
+func (m *Manager) SubscribeToCandles(coin, interval string, handler func(data types.CandleData) error) (string, error) {
+	sub := types.WSSubscription{
+		Type:     "candle",
+		Coin:     coin,
+		Interval: interval,
 	}
-	return m.Subscribe("candle", params)
+
+	return m.Subscribe(sub, func(raw json.RawMessage) error {
+		var data types.CandleData
+		if err := json.Unmarshal(raw, &data); err != nil {
+			return err
+		}
+		return handler(data)
+	})
 }
 
-// SubscribeToOrderUpdates subscribes to user's order updates
-func (m *Manager) SubscribeToOrderUpdates(user string) (*Subscription, error) {
-	params := map[string]interface{}{
-		"type": "orderUpdates",
-		"user": user,
+func (m *Manager) SubscribeToUserEvents(user string, handler func(data types.UserEvent) error) (string, error) {
+	sub := types.WSSubscription{
+		Type: "userEvents",
+		User: user,
 	}
-	return m.Subscribe("orderUpdates", params)
+
+	return m.Subscribe(sub, func(raw json.RawMessage) error {
+		var data types.UserEvent
+		if err := json.Unmarshal(raw, &data); err != nil {
+			return err
+		}
+		return handler(data)
+	})
 }
 
-// SubscribeToUserEvents subscribes to user events (fills, fundings, liquidations)
-func (m *Manager) SubscribeToUserEvents(user string) (*Subscription, error) {
-	params := map[string]interface{}{
-		"type": "userEvents",
-		"user": user,
+func (m *Manager) SubscribeToUserFills(user string, handler func(data types.UserFillData) error) (string, error) {
+	sub := types.WSSubscription{
+		Type: "userFills",
+		User: user,
 	}
-	return m.Subscribe("userEvents", params)
+
+	return m.Subscribe(sub, func(raw json.RawMessage) error {
+		var data types.UserFillData
+		if err := json.Unmarshal(raw, &data); err != nil {
+			return err
+		}
+		return handler(data)
+	})
 }
 
-// SubscribeToUserFills subscribes to user's fills only
-func (m *Manager) SubscribeToUserFills(user string) (*Subscription, error) {
-	params := map[string]interface{}{
-		"type": "userFills",
-		"user": user,
+func (m *Manager) SubscribeToOrderUpdates(user string, handler func(data types.OrderUpdate) error) (string, error) {
+	sub := types.WSSubscription{
+		Type: "orderUpdates",
+		User: user,
 	}
-	return m.Subscribe("userFills", params)
+
+	return m.Subscribe(sub, func(raw json.RawMessage) error {
+		var data types.OrderUpdate
+		if err := json.Unmarshal(raw, &data); err != nil {
+			return err
+		}
+		return handler(data)
+	})
 }
 
-// SubscribeToUserFundings subscribes to user's funding payments
-func (m *Manager) SubscribeToUserFundings(user string) (*Subscription, error) {
-	params := map[string]interface{}{
-		"type": "userFundings",
-		"user": user,
+func (m *Manager) SubscribeToUserFunding(user string, handler func(data types.FundingData) error) (string, error) {
+	sub := types.WSSubscription{
+		Type: "userFundings",
+		User: user,
 	}
-	return m.Subscribe("userFundings", params)
+
+	return m.Subscribe(sub, func(raw json.RawMessage) error {
+		var data types.FundingData
+		if err := json.Unmarshal(raw, &data); err != nil {
+			return err
+		}
+		return handler(data)
+	})
 }
 
-// SubscribeToLiquidations subscribes to liquidation events
-func (m *Manager) SubscribeToLiquidations(user *string) (*Subscription, error) {
-	params := map[string]interface{}{
-		"type": "liquidations",
+func (m *Manager) SubscribeToBBO(coin string, handler func(data types.BboData) error) (string, error) {
+	sub := types.WSSubscription{
+		Type: "bbo",
+		Coin: coin,
 	}
-	if user != nil {
-		params["user"] = *user
-	}
-	return m.Subscribe("liquidations", params)
+
+	return m.Subscribe(sub, func(raw json.RawMessage) error {
+		var data types.BboData
+		if err := json.Unmarshal(raw, &data); err != nil {
+			return err
+		}
+		return handler(data)
+	})
 }
 
-// ParseTradeUpdate parses a trade update message
-func ParseTradeUpdate(data json.RawMessage) (*types.Trade, error) {
-	var trade types.Trade
-	if err := json.Unmarshal(data, &trade); err != nil {
-		return nil, fmt.Errorf("failed to parse trade update: %w", err)
+func (m *Manager) SubscribeToActiveAssetCtx(coin string, handler func(data types.ActiveAssetCtxData) error) (string, error) {
+	sub := types.WSSubscription{
+		Type: "activeAssetCtx",
+		Coin: coin,
 	}
-	return &trade, nil
+
+	return m.Subscribe(sub, func(raw json.RawMessage) error {
+		var data types.ActiveAssetCtxData
+		if err := json.Unmarshal(raw, &data); err != nil {
+			return err
+		}
+		return handler(data)
+	})
 }
 
-// ParseL2Update parses an L2 book update message
-func ParseL2Update(data json.RawMessage) (*types.L2Book, error) {
-	var book types.L2Book
-	if err := json.Unmarshal(data, &book); err != nil {
-		return nil, fmt.Errorf("failed to parse L2 update: %w", err)
+func (m *Manager) SubscribeToActiveAssetData(coin, user string, handler func(data types.ActiveAssetDataData) error) (string, error) {
+	sub := types.WSSubscription{
+		Type: "activeAssetData",
+		Coin: coin,
+		User: user,
 	}
-	return &book, nil
+
+	return m.Subscribe(sub, func(raw json.RawMessage) error {
+		var data types.ActiveAssetDataData
+		if err := json.Unmarshal(raw, &data); err != nil {
+			return err
+		}
+		return handler(data)
+	})
 }
 
-// ParseCandleUpdate parses a candle update message
-func ParseCandleUpdate(data json.RawMessage) (*types.Candle, error) {
-	var candle types.Candle
-	if err := json.Unmarshal(data, &candle); err != nil {
-		return nil, fmt.Errorf("failed to parse candle update: %w", err)
+func (m *Manager) SubscribeToWebData2(user string, handler func(data types.WebData2Data) error) (string, error) {
+	sub := types.WSSubscription{
+		Type: "webData2",
+		User: user,
 	}
-	return &candle, nil
-}
 
-// ParseAllMidsUpdate parses an all mids update message
-func ParseAllMidsUpdate(data json.RawMessage) (map[string]string, error) {
-	var mids map[string]string
-	if err := json.Unmarshal(data, &mids); err != nil {
-		return nil, fmt.Errorf("failed to parse all mids update: %w", err)
-	}
-	return mids, nil
-}
-
-// ParseOrderUpdate parses an order update message
-func ParseOrderUpdate(data json.RawMessage) (map[string]interface{}, error) {
-	var update map[string]interface{}
-	if err := json.Unmarshal(data, &update); err != nil {
-		return nil, fmt.Errorf("failed to parse order update: %w", err)
-	}
-	return update, nil
-}
-
-// ParseUserFillUpdate parses a user fill update
-func ParseUserFillUpdate(data json.RawMessage) (*types.Fill, error) {
-	var fill types.Fill
-	if err := json.Unmarshal(data, &fill); err != nil {
-		return nil, fmt.Errorf("failed to parse fill update: %w", err)
-	}
-	return &fill, nil
-}
-
-// UserEvent represents a user event (fill, funding, liquidation)
-type UserEvent struct {
-	Type string          `json:"type"`
-	Data json.RawMessage `json:"data"`
-}
-
-// ParseUserEvent parses a user event
-func ParseUserEvent(data json.RawMessage) (*UserEvent, error) {
-	var event UserEvent
-	if err := json.Unmarshal(data, &event); err != nil {
-		return nil, fmt.Errorf("failed to parse user event: %w", err)
-	}
-	return &event, nil
+	return m.Subscribe(sub, func(raw json.RawMessage) error {
+		var data types.WebData2Data
+		if err := json.Unmarshal(raw, &data); err != nil {
+			return err
+		}
+		return handler(data)
+	})
 }

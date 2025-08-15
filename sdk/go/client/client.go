@@ -32,10 +32,6 @@ type Client struct {
 	address     string
 }
 
-type InfoClient struct {
-	client *Client
-}
-
 // NewClient creates a new Hyperliquid client
 func NewClient(baseURL, wsURL, privateKey string) *Client {
 	return &Client{
@@ -110,6 +106,16 @@ func (c *Client) request(ctx context.Context, endpoint string, payload interface
 	}
 
 	return respBody, nil
+}
+
+// InfoClient wraps the client for info API operations
+type InfoClient struct {
+	client *Client
+}
+
+// ExchangeClient wraps the client for exchange API operations
+type ExchangeClient struct {
+	client *Client
 }
 
 // Info returns an InfoClient for market data queries

@@ -9,10 +9,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// InfoClient handles market data and read-only operations
-type InfoClient struct {
-	client *Client
-}
+// InfoClient methods for market data and read-only operations
 
 // GetUserState retrieves the user's account state
 func (i *InfoClient) GetUserState(ctx context.Context, user string) (*types.UserState, error) {

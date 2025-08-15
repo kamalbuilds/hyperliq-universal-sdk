@@ -10,10 +10,7 @@ import (
 	"github.com/hyperliquid-labs/hyperliquid-go-sdk/utils"
 )
 
-// ExchangeClient handles trading operations that require authentication
-type ExchangeClient struct {
-	client *Client
-}
+// ExchangeClient methods for trading operations that require authentication
 
 // PlaceOrder places a new order
 func (e *ExchangeClient) PlaceOrder(ctx context.Context, order types.OrderRequest) (*types.OrderResponse, error) {

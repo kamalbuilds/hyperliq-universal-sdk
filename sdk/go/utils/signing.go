@@ -7,11 +7,13 @@ import (
 	"fmt"
 	"math/big"
 	"sort"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
+	"github.com/ethereum/go-ethereum/common/math"
 )
 
 // SignAction signs an action using EIP-712
@@ -81,7 +83,7 @@ func createTypedData(action interface{}, nonce int64) (*apitypes.TypedData, erro
 	domain := apitypes.TypedDataDomain{
 		Name:              "Hyperliquid",
 		Version:           "1",
-		ChainId:           (*hexutil.Big)(chainId),
+		ChainId:           (*math.HexOrDecimal256)(chainId),
 		VerifyingContract: "0x0000000000000000000000000000000000000000",
 	}
 
@@ -245,6 +247,10 @@ func removeHexPrefix(s string) string {
 
 // ValidateAddress checks if an address is valid
 func ValidateAddress(address string) bool {
+	// Check if it starts with 0x and is a valid hex address
+	if !strings.HasPrefix(address, "0x") {
+		return false
+	}
 	return common.IsHexAddress(address)
 }
 
