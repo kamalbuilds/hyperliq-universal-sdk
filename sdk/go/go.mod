@@ -1,12 +1,14 @@
 module github.com/hyperliquid-labs/hyperliquid-go-sdk
 
-go 1.21
+go 1.23.0
+
+toolchain go1.23.2
 
 require (
 	github.com/ethereum/go-ethereum v1.13.8
-	github.com/gorilla/websocket v1.5.1
-	github.com/shopspring/decimal v1.3.1
-	golang.org/x/time v0.5.0
+	github.com/gorilla/websocket v1.5.3
+	github.com/shopspring/decimal v1.4.0
+	golang.org/x/time v0.12.0
 )
 
 require (
