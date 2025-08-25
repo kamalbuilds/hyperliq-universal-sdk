@@ -6,9 +6,9 @@
 A comprehensive open-source SDK suite for Hyperliquid in multiple programming languages (Go, Java, C#) combined with a real-time notification system using the Node Info API. This project aims to expand developer accessibility and provide essential infrastructure for the Hyperliquid ecosystem.
 
 ## 🎯 Targeted Bounties
-1. **Hyperliquid SDK in other languages** - $3,000
-2. **Notification System using Node Info API** - $3,000
-3. **Track Prize Pool** - Up to $30,000 (1st place)
+1. **Public Goods Track Prize**
+2. **Hyperliquid SDK in other languages**
+3. **Notification System using Node Info API** 
 
 ## 🚀 Key Features
 
